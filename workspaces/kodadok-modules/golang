@@ -1,0 +1,8 @@
+RUN set -x \
+  && version=$(curl -SL "https://golang.org/VERSION?m=text") \
+  && curl -sSLo /tmp/"${version}".linux-amd64.tar.gz https://golang.org/dl/"${version}".linux-amd64.tar.gz \
+  && tar -C /usr/local -xzf /tmp/"${version}".linux-amd64.tar.gz \
+  && rm /tmp/"${version}".linux-amd64.tar.gz
+
+ENV GOROOT=/usr/local/go
+ENV PATH=$GOROOT/bin:$PATH

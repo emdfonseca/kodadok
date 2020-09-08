@@ -1,0 +1,48 @@
+name: Workspaces
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '5 3 * * *'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: dorny/paths-filter@v2.2.1
+      if: ${{ github.event_name != 'schedule' }}
+      id: filter
+      with:
+        filters: |
+          codeserver:
+            - 'workspaces/kodadok-code-server/**/*'
+          node:
+            - 'workspaces/kodadok-code-server/**/*'
+            - 'workspaces/kodadok-modules/node'
+          jdk:
+            - 'workspaces/kodadok-code-server/**/*'
+            - 'workspaces/kodadok-modules/node'
+            - 'workspaces/kodadok-modules/jdk'
+          golang:
+            - 'workspaces/kodadok-code-server/**/*'
+            - 'workspaces/kodadok-modules/node'
+            - 'workspaces/kodadok-modules/golang'
+    - name: docker login
+      uses: docker/login-action@v1.3.0
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    - name: build kodadok/code-server
+      if: ${{ steps.filter.outputs.codeserver == 'true' || github.event_name == 'schedule' }}
+      run: ./bin/kodadok-build -e code-server
+    - name: build kodadok/code-server-node
+      if: ${{ steps.filter.outputs.node == 'true' || github.event_name == 'schedule' }}
+      run: ./bin/kodadok-build -e code-server -p node
+    - name: build kodadok/code-server-node-jdk
+      if: ${{ steps.filter.outputs.jdk == 'true' || github.event_name == 'schedule' }}
+      run: ./bin/kodadok-build -e code-server -p node,jdk
+    - name: build kodadok/code-server-node-golang
+      if: ${{ steps.filter.outputs.golang == 'true' || github.event_name == 'schedule' }}
+      run: ./bin/kodadok-build -e code-server -p node,golang

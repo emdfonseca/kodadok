@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+
+###############################################################################
+# Fail fast
+###############################################################################
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+###############################################################################
+# Usage
+###############################################################################
+function usage() {
+cat << EOF
+usage: kodadok-build [OPTIONS]
+
+  -e, --editor      defines which code editor should be used as the basis for
+                    the workspace image. At the moment, only code-server is
+                    and is supported and is the default value. (code-server)
+  -p, --packages    comma separated list of packages you want to include in the
+                    workspace. (i.e. node,golang). Each new package will be
+                    added to the docker image as a layer in the sequence you
+                    provide them.
+  -t, --tag         defines the docker image tag. If not provided the tag name
+                    will be a concatenation between the chosen editor and the
+                    package names. If the version is not provided the script 
+                    looks up for the latest version from the chosen editor and
+                    uses it. (i.e. kodadok/code-server_node-jdk:latest)
+  -h, --help        displays this help menu.
+
+EOF
+}
+
+###############################################################################
+# Constants
+###############################################################################
+readonly tempdir=$( mktemp -d )
+
+###############################################################################
+# Trap Handler
+###############################################################################
+function handle_exit() {
+  rm -rf "${tempdir}"
+  exit
+}
+
+trap handle_exit 0 SIGHUP SIGINT SIGQUIT SIGABRT SIGTERM
+
+###############################################################################
+# Parse Arguments
+###############################################################################
+function _parse_args() {
+  RAW_PACKAGES=()
+  while [ "${1:-}" != "" ]; do
+    case "$1" in
+      -e | --editor )
+        shift
+        IFS='@' read -r -a RAW_EDITOR <<< "$1"
+      ;;
+      -p | --packages )
+        shift
+        IFS=',' read -r -a RAW_PACKAGES <<< "$1"
+      ;;
+      -t | --tag )
+        shift
+        IFS=':' read -r -a RAW_TAG <<< "$1"
+      ;;
+      -h | --help )
+        usage
+        exit
+      ;;
+      * )
+        echo "Error: unsupported argument '$1'"
+        usage
+        exit 1
+    esac
+    shift
+  done
+}
+
+function __dockerfile_template_path() {
+  echo "../workspaces/kodadok-$( _editor_name )/Dockerfile"
+}
+
+function _editor_name() {
+  echo "${RAW_EDITOR[0]:-code-server}"
+}
+
+function _editor_version() {
+  echo "${RAW_EDITOR[1]:-$( _editor_latest_release "$( _editor_name )" )}"
+}
+
+function _editor_latest_release() {
+  case "${1}" in
+  "code-server" )
+    curl -s "https://api.github.com/repos/cdr/code-server/releases/latest" |
+      grep '"tag_name":' |
+      sed -E 's/.*"([^"]+)".*/\1/' |
+      cut -c2-
+    ;;
+  esac
+}
+
+function _docker_image_name() {
+  local packages
+  local name
+  if [[ -n "${RAW_PACKAGES[*]:-}" ]]; then
+    packages=$( IFS=- ; echo "${RAW_PACKAGES[*]:-}" )
+    name=${RAW_TAG[0]:-kodadok/$( _editor_name )-${packages}}  
+  else
+    name=${RAW_TAG[0]:-kodadok/$( _editor_name )}
+  fi
+  echo "$name"
+}
+
+function _docker_image_version() {
+  local packages
+  local version
+  version=${RAW_TAG[1]:-$( _editor_version )}
+  echo "$version"
+}
+
+function _docker_image_tag() {
+  echo "$( _docker_image_name ):$( _docker_image_version )"
+}
+
+###############################################################################
+# Dockerfile
+###############################################################################
+function __dockerfile_partials() {
+  local package
+
+  if [[ -n "${RAW_PACKAGES[*]:-}" ]]; then
+    for package in "${RAW_PACKAGES[@]:-}"; do
+      echo -e "# ${package}"
+      cat ../workspaces/kodadok-modules/"${package}"
+      echo -e "\n"
+    done
+  fi
+}
+
+# This subprocess set the variable DOCKERFILE
+function _dockerfile() {
+  sed '/# DO NOT REMOVE - partials will be inserted here/{
+    r '<( __dockerfile_partials )'
+    D
+  }' "$( __dockerfile_template_path )"
+}
+
+###############################################################################
+# Main
+###############################################################################
+pushd "$(dirname "$0")" > /dev/null
+
+_parse_args "${@:1}"
+
+_dockerfile > "${tempdir}"/Dockerfile
+docker build \
+  -t "$( _docker_image_tag )" \
+  -t "$( _docker_image_tag )-$( date +%Y%m%d )" \
+  -t "$( _docker_image_name ):latest" \
+  --build-arg EDITOR_VERSION="$( _editor_version )" \
+  -f "${tempdir}"/Dockerfile \
+  ../workspaces/kodadok-"$( _editor_name )"
+
+docker push "$( _docker_image_name )"
+
+popd > /dev/null
