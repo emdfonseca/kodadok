@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "kodadok.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "kodadok.fullname" . }}:{{ .Values.editor.service.port }}']
   restartPolicy: Never

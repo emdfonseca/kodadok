@@ -5,11 +5,19 @@ metadata:
   labels:
     {{- include "kodadok.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.editor.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.port }}
+    - port: {{ .Values.editor.service.port }}
+      targetPort: {{ .Values.editor.service.port }}
       protocol: TCP
       name: http
+{{- range .Values.workspace.ingress.hosts }}
+  {{- range .paths }}
+    - port: {{ .port }}
+      targetPort: {{ .port }}
+      protocol: TCP
+      name: {{ .name }}
+  {{- end}}
+{{- end }}
   selector:
     {{- include "kodadok.selectorLabels" . | nindent 4 }}

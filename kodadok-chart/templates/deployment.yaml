@@ -53,7 +53,7 @@ spec:
             {{- toYaml .Values.editor.resources | nindent 12 }}
           volumeMounts:
             - name: home
-              mountPath: "/home/{{ .Values.editor.username }}"
+              mountPath: "/home/{{ .Values.workspace.username }}"
         {{- if .Values.docker.enabled }}
             - name: docker-dind-run
               mountPath: /var/run/dind
