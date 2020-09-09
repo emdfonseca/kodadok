@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "kodadok.labels" . | nindent 4 }}
 spec:
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   replicas: 1
   selector:
     matchLabels:
@@ -18,7 +19,6 @@ spec:
       labels:
         {{- include "kodadok.selectorLabels" . | nindent 8 }}
     spec:
-      revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
       {{- with .Values.editor.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
