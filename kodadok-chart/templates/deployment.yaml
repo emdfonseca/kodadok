@@ -93,4 +93,9 @@ spec:
           emptyDir: {}
         {{- end }}
         - name: home
+          {{- if .Values.workspace.storage }}
+          persistentVolumeClaim:
+            claimName: {{ include "kodadok.fullname" . }}
+          {{- else }}
           emptyDir: {}
+          {{- end }}

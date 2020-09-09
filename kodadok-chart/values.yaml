@@ -2,6 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+workspace:
+  storage: "10Gi"
 
 editor:
   username: kodadoker
@@ -43,7 +45,6 @@ docker:
     limits:
       memory: "3Gi"
       cpu: "2000m"
-
 
 nameOverride: ""
 fullnameOverride: ""
