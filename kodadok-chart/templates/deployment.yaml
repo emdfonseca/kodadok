@@ -18,7 +18,7 @@ spec:
       labels:
         {{- include "kodadok.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.editor.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -28,9 +28,13 @@ spec:
       containers:
         - name: editor
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- toYaml .Values.editor.securityContext | nindent 12 }}
+          image: "{{ .Values.editor.image.repository }}:{{ .Values.editor.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.editor.image.pullPolicy }}
+          {{- if .Values.docker.enabled }}
+          env:
+            - DOCKER_HOST: "unix:///var/run/dind/docker.sock"
+          {{- end }}
           ports:
             - name: http
               containerPort: 28801
@@ -44,7 +48,29 @@ spec:
               path: /
               port: http
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.editor.resources | nindent 12 }}
+          volumeMounts:
+            - name: home
+              mountPath: "{{ .Values.editor.username | default kodadoker }}"
+        {{- if .Values.docker.enabled }}
+            - name: docker-dind-run
+              mountPath: /var/run/dind
+        - name: docker
+          image: "{{ .Values.docker.image.repository }}:{{ .Values.docker.image.tag }}"
+          args:
+            - dockerd
+            - --storage-driver=overlay2
+            - -H unix:///var/run/dind/docker.sock
+          securityContext:
+            privileged: true
+          resources:
+            {{- toYaml .Values.docker.resources | nindent 12 }}
+          volumeMounts:
+            - name: docker-dind-run
+              mountPath: /var/run/dind
+            - name: docker-dind-lib
+              mountPath: /var/lib/docker
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -57,3 +83,12 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        {{- if .Values.docker.enabled }}
+        - name: docker-dind-lib
+          emptyDir: {}
+        - name: docker-dind-run
+          emptyDir: {}
+        {{- end }}
+        - name: home
+          emptyDir: {}
