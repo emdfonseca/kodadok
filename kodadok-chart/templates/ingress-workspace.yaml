@@ -10,14 +10,14 @@ metadata:
   name: {{ $fullName }}-workspace
   labels:
     {{- include "kodadok.labels" . | nindent 4 }}
-  {{- with Values.workspace.ingress.annotations }}
+  {{- with .Values.workspace.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if Values.workspace.ingress.tls }}
+  {{- if .Values.workspace.ingress.tls }}
   tls:
-    {{- range Values.workspace.ingress.tls }}
+    {{- range .Values.workspace.ingress.tls }}
     - hosts:
         {{- range .hosts }}
         - {{ . | quote }}
@@ -26,7 +26,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- range Values.workspace.ingress.hosts }}
+    {{- range .Values.workspace.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
