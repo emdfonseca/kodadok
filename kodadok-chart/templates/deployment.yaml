@@ -18,6 +18,7 @@ spec:
       labels:
         {{- include "kodadok.selectorLabels" . | nindent 8 }}
     spec:
+      revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
       {{- with .Values.editor.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
