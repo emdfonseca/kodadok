@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND interactive
 # install curl and gosu
 RUN set -x \
   && apt-get update -qq \
-  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git
+  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client
 
 # install code-server
 ARG EDITOR_VERSION
