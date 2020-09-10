@@ -1,0 +1,9 @@
+RUN set -x \
+  && curl -fsSL https://get.docker.com | bash - \
+  # leave docker client
+  && apt-get install -qq docker-ce-cli \ 
+  # remove docker daemon and dependencies
+  && apt-get purge -qq docker-ce \ 
+  && apt-get autoremove -qq \
+  # allow non-root user to exec docker
+  && usermod -aG docker ${USERNAME}

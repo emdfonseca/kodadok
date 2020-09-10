@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kodadok.fullname" . }}
+  labels:
+    {{- include "kodadok.labels" . | nindent 4 }}
+spec:
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "kodadok.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "kodadok.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.editor.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kodadok.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: editor
+          securityContext:
+            {{- toYaml .Values.editor.securityContext | nindent 12 }}
+          image: "{{ .Values.editor.image.repository }}:{{ .Values.editor.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.editor.image.pullPolicy }}
+          {{- if .Values.docker.enabled }}
+          env:
+            - name: DOCKER_HOST
+              value: "unix:///var/run/dind/docker.sock"
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 28801
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.editor.resources | nindent 12 }}
+          volumeMounts:
+            - name: home
+              mountPath: "/home/{{ .Values.workspace.username }}"
+        {{- if .Values.docker.enabled }}
+            - name: docker-dind-run
+              mountPath: /var/run/dind
+        - name: docker
+          image: "{{ .Values.docker.image.repository }}:{{ .Values.docker.image.tag }}"
+          args:
+            - dockerd
+            - --storage-driver=overlay2
+            - -H unix:///var/run/dind/docker.sock
+          securityContext:
+            privileged: true
+          resources:
+            {{- toYaml .Values.docker.resources | nindent 12 }}
+          volumeMounts:
+            - name: docker-dind-run
+              mountPath: /var/run/dind
+            - name: docker-dind-lib
+              mountPath: /var/lib/docker
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- if .Values.docker.enabled }}
+        - name: docker-dind-lib
+          emptyDir: {}
+        - name: docker-dind-run
+          emptyDir: {}
+        {{- end }}
+        - name: home
+          {{- if .Values.workspace.storage }}
+          persistentVolumeClaim:
+            claimName: {{ include "kodadok.fullname" . }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
