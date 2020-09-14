@@ -5,7 +5,8 @@ ENV DEBIAN_FRONTEND interactive
 # install curl and gosu
 RUN set -x \
   && apt-get update -qq \
-  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client
+  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client \
+  && rm -rf /var/lib/apt/lists/*
 
 # install code-server
 ARG EDITOR_VERSION
@@ -26,10 +27,6 @@ RUN set -e \
     && usermod -a -G root ${USERNAME}
 
 # DO NOT REMOVE - partials will be inserted here
-
-# cleanup apt
-RUN set -x \
-  && rm -rf /var/lib/apt/lists/*
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

@@ -6,4 +6,5 @@ RUN set -x \
   && apt-get purge -qq docker-ce \ 
   && apt-get autoremove -qq \
   # allow non-root user to exec docker
-  && usermod -aG docker ${USERNAME}
+  && usermod -aG docker ${USERNAME} \
+  && rm -rf /var/lib/apt/lists/*
