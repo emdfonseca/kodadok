@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: dorny/paths-filter@v2.2.1
-      if: ${{ github.event_name != 'schedule' }}
+      if: ${{ github.event_name != 'schedule' && github.event_name != 'workflow_dispatch' }}
       id: filter
       with:
         filters: |
@@ -44,26 +44,26 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
     - name: build kodadok/code-server
-      if: ${{ steps.filter.outputs.codeserver == 'true' || github.event_name == 'schedule' }}
+      if: ${{ steps.filter.outputs.codeserver == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -e code-server
     - name: build kodadok/code-server-node
-      if: ${{ steps.filter.outputs.node == 'true' || github.event_name == 'schedule' }}
+      if: ${{ steps.filter.outputs.node == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/code-server-node -e code-server -p node,docker
     - name: build kodadok/code-server-node-jdk
-      if: ${{ steps.filter.outputs.jdk == 'true' || github.event_name == 'schedule' }}
+      if: ${{ steps.filter.outputs.jdk == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/code-server-node-jdk -e code-server -p node,docker,jdk
     - name: build kodadok/code-server-node-golang
-      if: ${{ steps.filter.outputs.golang == 'true' || github.event_name == 'schedule' }}
+      if: ${{ steps.filter.outputs.golang == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/code-server-node-golang -e code-server -p node,docker,golang
     - name: build kodadok/theia
-      if: ${{ steps.filter.outputs.theia == 'true' || github.event_name == 'schedule' }}
+      if: ${{ steps.filter.outputs.theia == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -e theia
     - name: build kodadok/theia-node
-      if: ${{ steps.filter.outputs.node == 'true' || github.event_name == 'schedule' }}
+      if: ${{ steps.filter.outputs.node == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/theia-node -e theia -p node,docker
     - name: build kodadok/theia-node-jdk
-      if: ${{ steps.filter.outputs.jdk == 'true' || github.event_name == 'schedule' }}
+      if: ${{ steps.filter.outputs.jdk == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/theia-node-jdk -e theia -p node,docker,jdk
     - name: build kodadok/theia-node-golang
-      if: ${{ steps.filter.outputs.golang == 'true' || github.event_name == 'schedule' }}
+      if: ${{ steps.filter.outputs.golang == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/theia-node-golang -e theia -p node,docker,golang
