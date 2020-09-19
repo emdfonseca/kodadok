@@ -58,11 +58,16 @@ RUN set -e \
     && useradd --create-home --shell ${SHELL} -u ${UID} -g ${USERNAME} ${USERNAME} \
     && usermod -a -G root ${USERNAME}
 
+ENV SHELL=/bin/bash
+ENV THEIA_DEFAULT_PLUGINS=local-dir:/home/${NON_ROOT_USER}/plugins
+ENV USE_LOCAL_GIT true
+
 # DO NOT REMOVE - partials will be inserted here
 
 # cleanup apt
 RUN set -x \
   && rm -rf /var/lib/apt/lists/*
 
+EXPOSE 28801
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
