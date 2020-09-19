@@ -15,8 +15,8 @@ cat << EOF
 usage: kodadok-build [OPTIONS]
 
   -e, --editor      defines which code editor should be used as the basis for
-                    the workspace image. At the moment, only code-server is
-                    and is supported and is the default value. (code-server)
+                    the workspace image. Supported editors: code-server 
+                    (default), theia.
   -p, --packages    comma separated list of packages you want to include in the
                     workspace. (i.e. node,golang). Each new package will be
                     added to the docker image as a layer in the sequence you
@@ -25,7 +25,7 @@ usage: kodadok-build [OPTIONS]
                     will be a concatenation between the chosen editor and the
                     package names. If the version is not provided the script 
                     looks up for the latest version from the chosen editor and
-                    uses it. (i.e. kodadok/code-server_node-jdk:latest)
+                    uses it. (i.e. kodadok/code-server-node-jdk:latest)
   -h, --help        displays this help menu.
 
 EOF
@@ -94,6 +94,12 @@ function _editor_latest_release() {
   case "${1}" in
   "code-server" )
     curl -s "https://api.github.com/repos/cdr/code-server/releases/latest" |
+      grep '"tag_name":' |
+      sed -E 's/.*"([^"]+)".*/\1/' |
+      cut -c2-
+    ;;
+  "theia" )
+    curl -s "https://api.github.com/repos/eclipse-theia/theia/releases/latest" |
       grep '"tag_name":' |
       sed -E 's/.*"([^"]+)".*/\1/' |
       cut -c2-

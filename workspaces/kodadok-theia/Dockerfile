@@ -31,6 +31,12 @@ RUN set -x \
 
 FROM ubuntu:focal
 
+# install curl and gosu
+RUN set -x \
+  && apt-get update -qq \
+  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client \
+  && rm -rf /var/lib/apt/lists/*
+
 # install code-server
 ARG EDITOR_VERSION
 COPY --from=0 /usr/local/theia /usr/local/theia

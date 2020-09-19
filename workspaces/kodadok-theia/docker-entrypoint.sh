@@ -17,5 +17,7 @@ if [ "$MAP_NODE_UID" != "no" ]; then
     }
 fi
 
-cd /usr/local/theia
-exec gosu ${USER} /usr/local/theia/node/bin/node src-gen/backend/main.js /usr/${USER} --hostname=0.0.0.0
+mkdir -p /home/${USER}/workspace
+chown -R ${USER}:${USER} /home/${USER}/workspace
+cd /home/${USER}/workspace
+exec gosu ${USER} bash -c '/usr/local/theia/node/bin/node /usr/local/theia/src-gen/backend/main.js /home/${USER}/workspace --app-project-path /usr/local/theia --hostname=0.0.0.0 --port=28801'
