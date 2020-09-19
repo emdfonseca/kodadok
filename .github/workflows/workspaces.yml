@@ -19,17 +19,22 @@ jobs:
         filters: |
           codeserver:
             - 'workspaces/kodadok-code-server/**/*'
+          theia:
+            - 'workspaces/kodadok-theia/**/*'
           node:
             - 'workspaces/kodadok-code-server/**/*'
+            - 'workspaces/kodadok-theia/**/*'
             - 'workspaces/kodadok-modules/docker'
             - 'workspaces/kodadok-modules/node'
           jdk:
             - 'workspaces/kodadok-code-server/**/*'
+            - 'workspaces/kodadok-theia/**/*'
             - 'workspaces/kodadok-modules/node'
             - 'workspaces/kodadok-modules/docker'
             - 'workspaces/kodadok-modules/jdk'
           golang:
             - 'workspaces/kodadok-code-server/**/*'
+            - 'workspaces/kodadok-theia/**/*'
             - 'workspaces/kodadok-modules/node'
             - 'workspaces/kodadok-modules/docker'
             - 'workspaces/kodadok-modules/golang'
@@ -50,3 +55,15 @@ jobs:
     - name: build kodadok/code-server-node-golang
       if: ${{ steps.filter.outputs.golang == 'true' || github.event_name == 'schedule' }}
       run: ./bin/kodadok-build -t kodadok/code-server-node-golang -e code-server -p node,docker,golang
+    - name: build kodadok/theia
+      if: ${{ steps.filter.outputs.codeserver == 'true' || github.event_name == 'schedule' }}
+      run: ./bin/kodadok-build -e theia
+    - name: build kodadok/theia-node
+      if: ${{ steps.filter.outputs.node == 'true' || github.event_name == 'schedule' }}
+      run: ./bin/kodadok-build -t kodadok/theia-node -e theia -p node,docker
+    - name: build kodadok/theia-node-jdk
+      if: ${{ steps.filter.outputs.jdk == 'true' || github.event_name == 'schedule' }}
+      run: ./bin/kodadok-build -t kodadok/theia-node-jdk -e theia -p node,docker,jdk
+    - name: build kodadok/theia-node-golang
+      if: ${{ steps.filter.outputs.golang == 'true' || github.event_name == 'schedule' }}
+      run: ./bin/kodadok-build -t kodadok/theia-node-golang -e theia -p node,docker,golang
