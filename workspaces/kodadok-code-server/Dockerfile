@@ -15,8 +15,6 @@ RUN set -x \
   && dpkg -i /tmp/code-server_${EDITOR_VERSION}_amd64.deb \
   && rm /tmp/code-server_${EDITOR_VERSION}_amd64.deb
 
-# DO NOT REMOVE - partials will be inserted here
-
 # create non-root user
 ARG USERNAME=kodadoker
 ENV NON_ROOT_USER ${USERNAME}
@@ -27,6 +25,8 @@ RUN set -e \
     && groupadd -g ${GID} ${USERNAME} \
     && useradd --create-home --shell ${SHELL} -u ${UID} -g ${USERNAME} ${USERNAME} \
     && usermod -a -G root ${USERNAME}
+
+# DO NOT REMOVE - partials will be inserted here
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
