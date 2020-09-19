@@ -35,7 +35,7 @@ spec:
           {{- if .Values.docker.enabled }}
           env:
             - name: DOCKER_HOST
-              value: "unix:///var/run/dind/docker.sock"
+              value: "tcp://localhost:2375"
           {{- end }}
           ports:
             - name: http
@@ -55,21 +55,13 @@ spec:
             - name: home
               mountPath: "/home/{{ .Values.workspace.username }}"
         {{- if .Values.docker.enabled }}
-            - name: docker-dind-run
-              mountPath: /var/run/dind
         - name: docker
           image: "{{ .Values.docker.image.repository }}:{{ .Values.docker.image.tag }}"
-          args:
-            - dockerd
-            - --storage-driver=overlay2
-            - -H unix:///var/run/dind/docker.sock
           securityContext:
             privileged: true
           resources:
             {{- toYaml .Values.docker.resources | nindent 12 }}
           volumeMounts:
-            - name: docker-dind-run
-              mountPath: /var/run/dind
             - name: docker-dind-lib
               mountPath: /var/lib/docker
         {{- end }}
@@ -88,8 +80,6 @@ spec:
       volumes:
         {{- if .Values.docker.enabled }}
         - name: docker-dind-lib
-          emptyDir: {}
-        - name: docker-dind-run
           emptyDir: {}
         {{- end }}
         - name: home
