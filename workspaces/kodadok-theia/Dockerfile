@@ -1,7 +1,11 @@
+###
+# theia build image
+###
 FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND interactive
 
+# install build dependencies
 RUN mkdir -p /usr/local/theia/node \
   && apt-get update -qq \
   && apt-get install -qq curl ca-certificates build-essential python2 libx11-dev libxkbfile-dev \
@@ -12,7 +16,8 @@ RUN mkdir -p /usr/local/theia/node \
 
 COPY package.json /usr/local/theia
 WORKDIR /usr/local/theia
-# install curl and gosu
+
+# build theia
 RUN set -x \
   && export PATH="${PATH}:/usr/local/theia/node/bin" \
   && yarn --pure-lockfile \
@@ -27,8 +32,9 @@ RUN set -x \
   && yarn cache clean \
   && rm -rf /var/lib/apt/lists/*
 
-#####
-
+###
+# theia release image
+###
 FROM ubuntu:focal
 
 # install curl and gosu
@@ -37,8 +43,8 @@ RUN set -x \
   && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client \
   && rm -rf /var/lib/apt/lists/*
 
-# install code-server
-ARG EDITOR_VERSION
+# install code-server and node. node will be depoloyed inside the theia folder
+# in order to avoid conflicts with any other node versions
 COPY --from=0 /usr/local/theia /usr/local/theia
 
 # create non-root user
