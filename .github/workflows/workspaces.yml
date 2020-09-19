@@ -56,7 +56,7 @@ jobs:
       if: ${{ steps.filter.outputs.golang == 'true' || github.event_name == 'schedule' }}
       run: ./bin/kodadok-build -t kodadok/code-server-node-golang -e code-server -p node,docker,golang
     - name: build kodadok/theia
-      if: ${{ steps.filter.outputs.codeserver == 'true' || github.event_name == 'schedule' }}
+      if: ${{ steps.filter.outputs.theia == 'true' || github.event_name == 'schedule' }}
       run: ./bin/kodadok-build -e theia
     - name: build kodadok/theia-node
       if: ${{ steps.filter.outputs.node == 'true' || github.event_name == 'schedule' }}
