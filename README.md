@@ -1,4 +1,4 @@
-# KODA<span style="display: inline-block; transform: scaleX(-1);">KOD</span>
+# KODADOK
 
 Kodadok helps you deploy you own customized cloud code editor.
 
