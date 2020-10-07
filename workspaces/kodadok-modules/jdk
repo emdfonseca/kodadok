@@ -1,4 +1,4 @@
 RUN set -x \
   && apt-get update -qq \
-  && apt-get install -qq --no-install-recommends openjdk-14-jdk-headless maven gradle gnupg \
+  && apt-get install -qq --no-install-recommends openjdk-11-jdk-headless maven gnupg \
   && rm -rf /var/lib/apt/lists/*
