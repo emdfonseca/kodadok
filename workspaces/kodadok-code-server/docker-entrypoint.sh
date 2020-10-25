@@ -17,4 +17,4 @@ if [ "$MAP_NODE_UID" != "no" ]; then
     }
 fi
 
-exec gosu ${USER} code-server --auth none --bind-addr 0.0.0.0:28801
+exec gosu ${USER} code-server --auth none --bind-addr 0.0.0.0:28801 $@
