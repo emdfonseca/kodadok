@@ -39,7 +39,7 @@ spec:
             - name: DOCKER_HOST
               value: "tcp://localhost:2376"
             - name: DOCKER_CERT_PATH
-              value: /var/run/dind/certs/client
+              value: /var/run/docker/certs/client
             - name: DOCKER_TLS_VERIFY
               value: "true"
           {{- end }}
@@ -65,11 +65,13 @@ spec:
             - name: home
               mountPath: "/home/{{ .Values.workspace.username }}"
         {{- if .Values.docker.enabled }}
+            - name: docker-dind-run
+              mountPath: /var/run/docker
         - name: docker
           image: "{{ .Values.docker.image.repository }}:{{ .Values.docker.image.tag }}"
           env:
             - name: DOCKER_TLS_CERTDIR
-              value: /var/run/dind/certs
+              value: /var/run/docker/certs
           securityContext:
             privileged: true
           resources:
@@ -79,6 +81,8 @@ spec:
               mountPath: "/home/{{ .Values.workspace.username }}"
             - name: docker-dind-lib
               mountPath: /var/lib/docker
+            - name: docker-dind-run
+              mountPath: /var/run/docker
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -95,6 +99,8 @@ spec:
       volumes:
         {{- if .Values.docker.enabled }}
         - name: docker-dind-lib
+          emptyDir: {}
+        - name: docker-dind-run
           emptyDir: {}
         {{- end }}
         - name: home
