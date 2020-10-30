@@ -46,6 +46,10 @@ spec:
           {{- if .Values.workspace.password }}
             - name: PASSWORD
               value: {{ .Values.workspace.password }}
+          {{- with .Values.editor.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- end }}
           ports:
             - name: http

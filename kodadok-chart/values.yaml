@@ -31,6 +31,9 @@ editor:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: latest
+  args:
+    - --auth=password
+    - --user-data-dir=/home/kodadoker/.local/share/code-server
   imagePullSecrets: []
   securityContext: {}
   # capabilities:
