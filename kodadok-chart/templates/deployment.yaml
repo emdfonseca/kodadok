@@ -32,10 +32,20 @@ spec:
             {{- toYaml .Values.editor.securityContext | nindent 12 }}
           image: "{{ .Values.editor.image.repository }}:{{ .Values.editor.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.editor.image.pullPolicy }}
-          {{- if .Values.docker.enabled }}
           env:
+            - name: WORKSPACE_USERNAME
+              value: {{ .Values.workspace.username }}
+          {{- if .Values.docker.enabled }}
             - name: DOCKER_HOST
-              value: "tcp://localhost:2375"
+              value: "tcp://localhost:2376"
+            - name: DOCKER_CERT_PATH
+              value: /var/run/dind/certs/client
+            - name: DOCKER_TLS_VERIFY
+              value: true
+          {{-end}}
+          {{- if .Values.workspace.password }}
+            - name: PASSWORD
+              value: {{ .Values.workspace.password }}
           {{- end }}
           ports:
             - name: http
@@ -57,11 +67,16 @@ spec:
         {{- if .Values.docker.enabled }}
         - name: docker
           image: "{{ .Values.docker.image.repository }}:{{ .Values.docker.image.tag }}"
+          env:
+            - name: DOCKER_TLS_CERTDIR
+              value: /var/run/dind/certs
           securityContext:
             privileged: true
           resources:
             {{- toYaml .Values.docker.resources | nindent 12 }}
           volumeMounts:
+            - name: home
+              mountPath: "/home/{{ .Values.workspace.username }}"
             - name: docker-dind-lib
               mountPath: /var/lib/docker
         {{- end }}

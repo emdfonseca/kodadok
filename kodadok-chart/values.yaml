@@ -4,6 +4,7 @@
 
 workspace:
   username: kodadoker
+  # password: my-sample-password
   storage: "10Gi"
   ingress:
     enabled: false
@@ -78,7 +79,7 @@ docker:
   image:
     repository: docker
     pullPolicy: IfNotPresent
-    tag: dind
+    tag: 19.03.13-dind
   resources:
     requests:
       memory: "512Mi"
