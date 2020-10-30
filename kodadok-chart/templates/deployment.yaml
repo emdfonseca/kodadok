@@ -41,8 +41,8 @@ spec:
             - name: DOCKER_CERT_PATH
               value: /var/run/dind/certs/client
             - name: DOCKER_TLS_VERIFY
-              value: true
-          {{-end}}
+              value: "true"
+          {{- end }}
           {{- if .Values.workspace.password }}
             - name: PASSWORD
               value: {{ .Values.workspace.password }}
