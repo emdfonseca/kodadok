@@ -27,7 +27,8 @@ jobs:
             - 'workspaces/kodadok-code-server/**/*'
             - 'workspaces/kodadok-modules/docker'
             - 'workspaces/kodadok-modules/node'
-            - 'workspaces/kodadok-modules/jdk'
+            - 'workspaces/kodadok-modules/jdk8'
+            - 'workspaces/kodadok-modules/jdk14'
           codeserver_golang:
             - 'workspaces/kodadok-code-server/**/*'
             - 'workspaces/kodadok-modules/docker'
@@ -43,7 +44,8 @@ jobs:
             - 'workspaces/kodadok-theia/**/*'
             - 'workspaces/kodadok-modules/docker'
             - 'workspaces/kodadok-modules/node'
-            - 'workspaces/kodadok-modules/jdk'
+            - 'workspaces/kodadok-modules/jdk8'
+            - 'workspaces/kodadok-modules/jdk14'
           theia_golang:
             - 'workspaces/kodadok-theia/**/*'
             - 'workspaces/kodadok-modules/docker'
@@ -60,9 +62,12 @@ jobs:
     - name: build kodadok/code-server-node
       if: ${{ steps.filter.outputs.codeserver_node == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/code-server-node -e code-server -p node,docker
-    - name: build kodadok/code-server-node-jdk
-      if: ${{ steps.filter.outputs.codeserver_jdk == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
-      run: ./bin/kodadok-build -t kodadok/code-server-node-jdk -e code-server -p node,docker,jdk
+    - name: build kodadok/code-server-node-jdk8
+      if: ${{ steps.filter.outputs.codeserver_jdk8 == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+      run: ./bin/kodadok-build -t kodadok/code-server-node-jdk8 -e code-server -p node,docker,jdk8
+    - name: build kodadok/code-server-node-jdk14
+      if: ${{ steps.filter.outputs.codeserver_jdk14 == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+      run: ./bin/kodadok-build -t kodadok/code-server-node-jdk14 -e code-server -p node,docker,jdk14
     - name: build kodadok/code-server-node-golang
       if: ${{ steps.filter.outputs.codeserver_golang == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/code-server-node-golang -e code-server -p node,docker,golang
@@ -72,9 +77,12 @@ jobs:
     - name: build kodadok/theia-node
       if: ${{ steps.filter.outputs.theia_node == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/theia-node -e theia -p node,docker
-    - name: build kodadok/theia-node-jdk
-      if: ${{ steps.filter.outputs.theia_jdk == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
-      run: ./bin/kodadok-build -t kodadok/theia-node-jdk -e theia -p node,docker,jdk
+    - name: build kodadok/theia-node-jdk8
+      if: ${{ steps.filter.outputs.theia_jdk8 == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+      run: ./bin/kodadok-build -t kodadok/theia-node-jdk8 -e theia -p node,docker,jdk8
+    - name: build kodadok/theia-node-jdk14
+      if: ${{ steps.filter.outputs.theia_jdk14 == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+      run: ./bin/kodadok-build -t kodadok/theia-node-jdk14 -e theia -p node,docker,jdk14
     - name: build kodadok/theia-node-golang
       if: ${{ steps.filter.outputs.theia_golang == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       run: ./bin/kodadok-build -t kodadok/theia-node-golang -e theia -p node,docker,golang
