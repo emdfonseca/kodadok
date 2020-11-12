@@ -1,4 +1,6 @@
 RUN set -x \
   && apt-get update -qq \
   && apt-get install -qq openjdk-8-jdk-headless maven gradle gnupg \
+  && apt-get remove openjdk-11-jre-headless \
+  && apt-get autoremove \
   && rm -rf /var/lib/apt/lists/*
