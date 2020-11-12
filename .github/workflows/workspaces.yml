@@ -23,11 +23,15 @@ jobs:
             - 'workspaces/kodadok-code-server/**/*'
             - 'workspaces/kodadok-modules/docker'
             - 'workspaces/kodadok-modules/node'
-          codeserver_jdk:
+          codeserver_jdk8:
             - 'workspaces/kodadok-code-server/**/*'
             - 'workspaces/kodadok-modules/docker'
             - 'workspaces/kodadok-modules/node'
             - 'workspaces/kodadok-modules/jdk8'
+          codeserver_jdk14:
+            - 'workspaces/kodadok-code-server/**/*'
+            - 'workspaces/kodadok-modules/docker'
+            - 'workspaces/kodadok-modules/node'
             - 'workspaces/kodadok-modules/jdk14'
           codeserver_golang:
             - 'workspaces/kodadok-code-server/**/*'
