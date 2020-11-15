@@ -40,7 +40,7 @@ FROM ubuntu:focal
 # install curl and gosu
 RUN set -x \
   && apt-get update -qq \
-  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client \
+  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client bash-completion libncurses5 \
   && rm -rf /var/lib/apt/lists/*
 
 # install code-server and node. node will be depoloyed inside the theia folder
