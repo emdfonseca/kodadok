@@ -1,5 +1,5 @@
 RUN set -x \
-  && version=$(curl -SL "https://golang.org/VERSION?m=text") \
+  && version=$(curl -sL "https://golang.org/dl/?mode=json" | perl -ne 'print "$1\n" if /"version": "(.*?)"/' | head -n1) \
   && curl -sSLo /tmp/"${version}".linux-amd64.tar.gz https://golang.org/dl/"${version}".linux-amd64.tar.gz \
   && tar -C /usr/local -xzf /tmp/"${version}".linux-amd64.tar.gz \
   && rm /tmp/"${version}".linux-amd64.tar.gz
