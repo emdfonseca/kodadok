@@ -40,7 +40,7 @@ FROM ubuntu:focal
 # install curl and gosu
 RUN set -x \
   && apt-get update -qq \
-  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client bash-completion libncurses5 tmux \
+  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client bash-completion libncurses5 tmux less \
   && rm -rf /var/lib/apt/lists/*
 
 # install code-server and node. node will be depoloyed inside the theia folder
@@ -61,8 +61,11 @@ RUN set -e \
 ENV SHELL=/bin/bash
 ENV THEIA_DEFAULT_PLUGINS=local-dir:/home/${NON_ROOT_USER}/plugins
 ENV USE_LOCAL_GIT true
+COPY --chown=1000:1000 tmux.conf /home/${USERNAME}/.tmux.conf
 
 # DO NOT REMOVE - partials will be inserted here
+
+COPY 
 
 # cleanup apt
 RUN set -x \

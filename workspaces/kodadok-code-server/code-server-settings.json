@@ -1,0 +1,6 @@
+{
+    "workbench.colorTheme": "Default Dark+",
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "terminal.integrated.shellArgs.linux": ["-c", "tmux attach-session -d -t 0 || tmux new-session -s 0"],
+    "explorer.autoReveal": false
+}

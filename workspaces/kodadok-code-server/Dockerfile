@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND interactive
 # install curl and gosu
 RUN set -x \
   && apt-get update -qq \
-  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client bash-completion libncurses5 tmux \
+  && apt-get install -qq --no-install-recommends curl ca-certificates net-tools iproute2 gosu neovim git openssh-client bash-completion libncurses5 tmux less \
   && rm -rf /var/lib/apt/lists/*
 
 # install code-server
@@ -25,8 +25,12 @@ RUN set -e \
     && groupadd -g ${GID} ${USERNAME} \
     && useradd --create-home --shell ${SHELL} -u ${UID} -g ${USERNAME} ${USERNAME} \
     && usermod -a -G root ${USERNAME}
+COPY --chown=1000:1000 tmux.conf /home/${USERNAME}/.tmux.conf
+RUN mkdir -p /home/${USERNAME}/.local/share/code-server/User/
+COPY --chown=1000:1000 code-server-settings.json /home/${USERNAME}/.local/share/code-server/User/settings.json
 
 # DO NOT REMOVE - partials will be inserted here
+
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
