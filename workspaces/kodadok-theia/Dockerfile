@@ -65,8 +65,6 @@ COPY --chown=1000:1000 tmux.conf /home/${USERNAME}/.tmux.conf
 
 # DO NOT REMOVE - partials will be inserted here
 
-COPY 
-
 # cleanup apt
 RUN set -x \
   && rm -rf /var/lib/apt/lists/*
